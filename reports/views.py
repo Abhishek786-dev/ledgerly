@@ -132,7 +132,7 @@ class PaymentMethodsView(APIView):
         payment_methods_expenses = (
             queryset.values('payment_method__method_name')
             .annotate(total=Sum('total_amount'))
-            .order_by('expense_date')
+            .order_by('payment_method__method_name')
         )
         
         data = []
