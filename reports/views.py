@@ -140,14 +140,15 @@ class PaymentMethodsView(APIView):
 
     def get(self, request):
         start_date = request.query_params.get("start_date")
-        today = timezone.now().date()
         if start_date:
-            start_date = get_bom(start_date)
-
-        start_date = today.replace(day=1)
-        queryset = Expense.objects.filter(
-            user=request.user, expense_date__gte=start_date
-        )
+            selected_date = datetime.strptime(start_date, "%Y-%m")
+            queryset = Expense.objects.filter(
+                user=request.user,
+                expense_date__year=selected_date.year,
+                expense_date__month=selected_date.month,
+            )
+        else:
+            queryset = Expense.objects.filter(user=request.user)
 
         payment_methods_expenses = (
             queryset.values("payment_method__method_name")
