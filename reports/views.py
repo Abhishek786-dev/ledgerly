@@ -113,14 +113,14 @@ class MonthlyExpensesView(APIView):
             user=request.user, expense_date__gte=last_12_months
         )
 
-        start_date = request.query_params.get("start_date")
-        end_date = request.query_params.get("end_date")
+        # start_date = request.query_params.get("start_date")
+        # end_date = request.query_params.get("end_date")
 
-        if start_date:
-            start_date = get_bom(start_date)
-            queryset = queryset.filter(expense_date__gte=start_date)
-        if end_date:
-            queryset = queryset.filter(expense_date__lte=end_date)
+        # if start_date:
+        #     start_date = get_bom(start_date)
+        #     queryset = queryset.filter(expense_date__gte=start_date)
+        # if end_date:
+        #     queryset = queryset.filter(expense_date__lte=end_date)
 
         monthly_expenses = (
             queryset.annotate(month=TruncMonth("expense_date"))
