@@ -22,6 +22,19 @@ def get_bom(date):
     return beginning_of_month
 
 
+def get_eom(date):
+    """
+    Get the end of the month for a given date(YYYY-MM)
+    Args:  date (str): The date in the format "YYYY-MM"
+    Returns:  datetime.date: The end of the month for the given date
+    Example:  get_eom("2024-06") -> datetime.date(2024, 6, 30)
+    """
+    date_obj = datetime.strptime(date, "%Y-%m").date()
+    next_month = date_obj.replace(day=28) + timedelta(days=4)
+    end_of_month = next_month - timedelta(days=next_month.day)
+    return end_of_month
+
+
 class WeeklyExpensesView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -35,8 +48,15 @@ class WeeklyExpensesView(APIView):
         end_date = request.query_params.get("end_date")
 
         if start_date:
-            start_date = get_bom(start_date)
-            queryset = queryset.filter(expense_date__gte=start_date)
+            selected_date = datetime.strptime(start_date, "%Y-%m")
+            if selected_date.year == today.year and selected_date.month == today.month:
+                queryset = queryset.filter(expense_date__gte=last_7_days)
+            else:
+                start_date = get_eom(start_date)
+                last_7_days = start_date - timedelta(days=7)
+                queryset = queryset.filter(
+                    expense_date__gte=last_7_days, expense_date__lte=start_date
+                )
         else:
             queryset = queryset.filter(expense_date__gte=last_7_days)
 
