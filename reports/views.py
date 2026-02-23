@@ -142,7 +142,7 @@ class PaymentMethodsView(APIView):
         start_date = request.query_params.get("start_date")
         today = timezone.now().date()
         if start_date:
-            today = get_bom(start_date)
+            start_date = get_bom(start_date)
 
         start_date = today.replace(day=1)
         queryset = Expense.objects.filter(
@@ -173,13 +173,15 @@ class CategoryExpensesView(APIView):
 
     def get(self, request):
         start_date = request.query_params.get("start_date")
-        today = timezone.now().date()
         if start_date:
-            today = get_bom(start_date)
-        current_month = today.replace(day=1)
-        queryset = Expense.objects.filter(
-            user=request.user, expense_date__gte=current_month
-        )
+            selected_date = datetime.strptime(start_date, "%Y-%m")
+            queryset = Expense.objects.filter(
+                user=request.user,
+                expense_date__year=selected_date.year,
+                expense_date__month=selected_date.month,
+            )
+        else:
+            queryset = Expense.objects.filter(user=request.user)
 
         category_expenses = (
             queryset.values("category__category_name")
