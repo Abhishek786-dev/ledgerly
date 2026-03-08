@@ -108,11 +108,12 @@ REST_FRAMEWORK = {
         "dj_rest_auth.jwt_auth.JWTCookieAuthentication",
     ),
 }
-
+# "USER_DETAILS_SERIALIZER": "accounts.serializers.CustomUserSerializer",
 REST_AUTH = {
     "USE_JWT": True,
     "JWT_AUTH_COOKIE": "my-app-auth",
     "JWT_AUTH_REFRESH_COOKIE": "my-app-refresh-token",
+    "USER_DETAILS_SERIALIZER": "accounts.serializers.CustomUserSerializer",
 }
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",

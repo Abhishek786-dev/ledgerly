@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework import serializers
@@ -12,11 +13,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'password', 'mobile')
+        fields = ("email", "username", "password", "mobile")
 
     @transaction.atomic
     def create(self, validated_data):
-        mobile = validated_data.pop('mobile', None)
+        mobile = validated_data.pop("mobile", None)
         user = User.objects.create_user(**validated_data)
 
         # Update profile (already created by signal)
@@ -29,9 +30,9 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         return user
 
-class LoginSerializer(TokenObtainPairSerializer):
 
-    username_field = 'email'
+class LoginSerializer(TokenObtainPairSerializer):
+    username_field = "email"
 
     def validate(self, attrs):
         email = attrs.get("email")
@@ -59,12 +60,22 @@ class LoginSerializer(TokenObtainPairSerializer):
 
         return data
 
+
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
 
     def save(self, **kwargs):
         try:
-            token = RefreshToken(self.validated_data['refresh'])
+            token = RefreshToken(self.validated_data["refresh"])
             token.blacklist()
         except Exception:
-            self.fail('bad_token')
+            self.fail("bad_token")
+
+
+User = get_user_model()
+
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "username", "email")
